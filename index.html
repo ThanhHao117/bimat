@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chúc Mừng 20/10</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        /* Kiểu chữ thướt tha cho tiêu đề */
+        .font-dancing {
+            font-family: 'Dancing Script', cursive;
+        }
+
+        /* Hiệu ứng gradient và lấp lánh cho chữ - ĐÃ LÀM ĐẬM HƠN */
+        .animated-text {
+            /* Thay đổi màu sang các tông đậm hơn */
+            background: linear-gradient(45deg, #be185d, #ef4444, #be185d);
+            background-size: 200% 200%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: gradient-animation 4s ease infinite, sparkle 2s infinite;
+        }
+
+        @keyframes gradient-animation {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        @keyframes sparkle {
+             /* Tăng cường hiệu ứng đổ bóng với màu đậm hơn */
+            0%, 100% { text-shadow: 0 0 5px #fff, 0 0 10px #fce7f3, 0 0 15px #f472b6, 0 0 20px #f472b6; }
+            50% { text-shadow: 0 0 10px #fff, 0 0 15px #f0abfc, 0 0 20px #db2777, 0 0 25px #db2777; }
+        }
+
+        /* Video nền */
+        #bg-video {
+            position: fixed;
+            right: 0;
+            bottom: 0;
+            min-width: 100%;
+            min-height: 100%;
+            z-index: -2;
+            object-fit: cover;
+        }
+
+        /* Lớp phủ mờ trên video để chữ dễ đọc hơn */
+        .video-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.4);
+            z-index: -1;
+        }
+        
+        /* Hiệu ứng rung lắc khi nhập liệu sai */
+        @keyframes shake {
+          10%, 90% { transform: translate3d(-1px, 0, 0); }
+          20%, 80% { transform: translate3d(2px, 0, 0); }
+          30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+          40%, 60% { transform: translate3d(4px, 0, 0); }
+        }
+        .animate-shake {
+            animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800">
+
+    <video autoplay muted loop id="bg-video">
+        <!-- Thay thế bằng link video của bạn nếu muốn -->
+        <source src="images/Hình nền động dành cho PC - Video Wallpaper - 03.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+    <div class="video-overlay"></div>
+
+    <div id="app-container" class="min-h-screen flex items-center justify-center p-4">
+        
+        <!-- Trang Chủ -->
+        <div id="home-page" class="w-full max-w-lg text-center">
+            <h1 id="typing-text" class="text-8xl md:text-9xl font-bold animated-text font-dancing mb-8 min-h-[120px]"></h1>
+            <p id="status-message" class="font-semibold mb-4 h-6"></p>
+            <form id="name-form" class="relative">
+                <input type="text" id="name-input" placeholder="Hãy nhập vào tên của bạn" class="w-full px-6 py-4 text-lg bg-white bg-opacity-80 border-2 border-pink-300 rounded-full focus:outline-none focus:ring-4 focus:ring-pink-400 focus:border-pink-500 transition-all duration-300 shadow-lg" autocomplete="off">
+                <div class="absolute right-4 top-1/2 -translate-y-1/2 text-pink-400 text-3xl">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="currentColor"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5C2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3C19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+                </div>
+            </form>
+            <button type="submit" form="name-form" class="mt-6 px-12 py-3 bg-pink-500 text-white font-bold text-xl rounded-full hover:bg-pink-600 transition-transform transform hover:scale-105 shadow-xl">Gửi</button>
+        </div>
+
+        <!-- Trang Nhập Lời Chúc (Admin) -->
+        <div id="admin-page" class="w-full max-w-2xl text-center bg-white bg-opacity-90 p-8 rounded-2xl shadow-2xl hidden">
+            <h1 class="text-7xl md:text-8xl font-bold animated-text font-dancing mb-6">20/10</h1>
+            <textarea id="wish-input" class="w-full h-40 p-4 border-2 border-pink-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-400 mb-4" placeholder="Hãy nhập lời chúc cho người yêu thương của bạn"></textarea>
+            <div class="mb-4">
+                <label for="image-upload" class="cursor-pointer inline-block px-6 py-3 bg-rose-400 text-white rounded-lg hover:bg-rose-500">Tải ảnh (tối đa 3)</label>
+                <input type="file" id="image-upload" multiple accept="image/*" class="hidden">
+            </div>
+            <div id="image-preview" class="flex justify-center gap-4 mb-6"></div>
+            <button id="save-wish-btn" class="w-full px-12 py-3 bg-pink-500 text-white font-bold text-xl rounded-full hover:bg-pink-600 transition-transform transform hover:scale-105 shadow-xl">Lưu</button>
+        </div>
+
+        <!-- Trang Chứa Lời Chúc -->
+        <div id="greeting-page" class="w-full max-w-4xl bg-white bg-opacity-95 p-6 md:p-10 rounded-3xl shadow-2xl text-center hidden">
+             <h1 class="text-6xl md:text-7xl font-bold animated-text font-dancing mb-4">20/10</h1>
+            <h2 id="recipient-name-display" class="text-3xl font-semibold text-gray-700 mb-6"></h2>
+            <div class="bg-rose-50 p-6 rounded-2xl border-l-4 border-rose-400 mb-6">
+                <p id="wish-display" class="text-lg text-gray-600 leading-relaxed whitespace-pre-wrap"></p>
+            </div>
+            <div id="images-display" class="grid grid-cols-1 md:grid-cols-3 gap-4"></div>
+             <button id="back-to-home-btn" class="mt-8 px-8 py-2 bg-pink-500 text-white font-bold rounded-full hover:bg-pink-600 transition-transform transform hover:scale-105 shadow-lg">Quay về trang chủ</button>
+        </div>
+
+        <!-- Modal Báo Lỗi -->
+        <div id="error-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 hidden">
+            <div class="bg-white p-8 rounded-2xl shadow-2xl text-center">
+                <p class="text-xl text-red-500 mb-6">Tên này chưa có lời chúc nào. <br> Bạn hãy thử lại nhé!</p>
+                <button id="retry-btn" class="px-8 py-2 bg-red-500 text-white font-bold rounded-full hover:bg-red-600">Nhập lại</button>
+            </div>
+        </div>
+        
+        <!-- Modal Xác Nhận Lưu -->
+        <div id="confirm-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 hidden">
+            <div class="bg-white p-8 rounded-2xl shadow-2xl text-center">
+                <p class="text-xl mb-6">Bạn chắc chắn lưu lại lời yêu thương này chứ?</p>
+                <div class="flex gap-4 justify-center">
+                    <button id="back-btn" class="px-8 py-2 bg-gray-400 text-white font-bold rounded-full hover:bg-gray-500">Quay lại</button>
+                    <button id="continue-btn" class="px-8 py-2 bg-pink-500 text-white font-bold rounded-full hover:bg-pink-600">Tiếp tục</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Modal Nhập Tên Người Nhận -->
+        <div id="recipient-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 hidden">
+            <div class="bg-white p-8 rounded-2xl shadow-2xl text-center">
+                <p class="text-xl mb-4">Hãy nhập tên người yêu thương của bạn</p>
+                <input type="text" id="recipient-name-input" class="w-full px-4 py-2 border-2 border-pink-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-400 mb-4" />
+                <button id="ok-btn" class="px-8 py-2 bg-pink-500 text-white font-bold rounded-full hover:bg-pink-600">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        // --- Import Firebase ---
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            // --- Firebase Initialization ---
+
+            // Cấu hình Firebase của bạn đã được dán vào đây.
+            const userFirebaseConfig = {
+                apiKey: "AIzaSyBZ0BE51RXCAaeW0NNKpLFZnBD3NaouSUg",
+                authDomain: "oi-chuc-20-10.firebaseapp.com",
+                projectId: "oi-chuc-20-10",
+                storageBucket: "oi-chuc-20-10.appspot.com",
+                messagingSenderId: "336530894385",
+                appId: "1:336530894385:web:b2534d9962a49898d96f10",
+                measurementId: "G-6DGPHX4ZN8"
+            };
+
+            let db;
+            try {
+                // Ưu tiên sử dụng cấu hình do Canvas cung cấp. Nếu không có, dùng cấu hình của người dùng.
+                const configToUse = typeof __firebase_config !== 'undefined' && __firebase_config
+                    ? JSON.parse(__firebase_config)
+                    : userFirebaseConfig;
+
+                // Kiểm tra xem cấu hình có hợp lệ không
+                if (!configToUse || !configToUse.apiKey) {
+                    throw new Error("Firebase config is missing. Please provide it in userFirebaseConfig if running outside Canvas.");
+                }
+
+                const app = initializeApp(configToUse);
+                db = getFirestore(app);
+                const auth = getAuth(app);
+
+                // Sử dụng auth token của Canvas nếu có, nếu không thì đăng nhập ẩn danh
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+                
+                console.log("Firebase connected successfully!");
+            } catch (e) {
+                console.error("Firebase initialization failed:", e);
+                const statusMsg = document.getElementById('status-message');
+                statusMsg.textContent = "Lỗi kết nối cơ sở dữ liệu.";
+                statusMsg.classList.add('text-red-500');
+                // Vô hiệu hóa form nếu không có kết nối
+                document.getElementById('name-form').addEventListener('submit', (ev) => ev.preventDefault());
+                document.querySelector('button[form="name-form"]').disabled = true;
+            }
+
+            // --- Quản lý các phần tử DOM ---
+            const pages = {
+                home: document.getElementById('home-page'),
+                admin: document.getElementById('admin-page'),
+                greeting: document.getElementById('greeting-page')
+            };
+            const modals = {
+                error: document.getElementById('error-modal'),
+                confirm: document.getElementById('confirm-modal'),
+                recipient: document.getElementById('recipient-modal')
+            };
+            const inputs = {
+                name: document.getElementById('name-input'),
+                wish: document.getElementById('wish-input'),
+                image: document.getElementById('image-upload'),
+                recipientName: document.getElementById('recipient-name-input')
+            };
+            const buttons = {
+                nameForm: document.getElementById('name-form'),
+                retry: document.getElementById('retry-btn'),
+                saveWish: document.getElementById('save-wish-btn'),
+                back: document.getElementById('back-btn'),
+                continue: document.getElementById('continue-btn'),
+                ok: document.getElementById('ok-btn'),
+                backToHome: document.getElementById('back-to-home-btn')
+            };
+            const displays = {
+                statusMessage: document.getElementById('status-message'),
+                imagePreview: document.getElementById('image-preview'),
+                recipientName: document.getElementById('recipient-name-display'),
+                wish: document.getElementById('wish-display'),
+                images: document.getElementById('images-display')
+            };
+
+            // --- Quản lý trạng thái ứng dụng ---
+            const state = {
+                validNames: ['Trần Thị Kim Hiền', 'Trần Thị Trúc Loan', 'Trương Kim Ngần', 'Cao Thị Huyền Trân'],
+                adminPassword: '24050117',
+                tempWish: '',
+                tempImages: []
+            };
+
+            // --- Hiệu ứng gõ chữ (Đã sửa lỗi) ---
+            const typingTextElement = document.getElementById('typing-text');
+            const textToType = "20/10";
+            let typingIndex = 0;
+            let isDeleting = false;
+
+            function typeEffect() {
+                const currentText = textToType.substring(0, typingIndex);
+                typingTextElement.textContent = currentText || '\u00A0'; // Dùng ký tự không ngắt dòng để giữ chiều cao
+
+                if (!isDeleting && typingIndex < textToType.length) {
+                    typingIndex++;
+                } else if (isDeleting && typingIndex > 0) {
+                    typingIndex--;
+                } else {
+                    isDeleting = !isDeleting;
+                    setTimeout(typeEffect, isDeleting ? 3000 : 1000); // Tạm dừng khi gõ xong hoặc xóa xong
+                    return;
+                }
+                const typingSpeed = isDeleting ? 150 : 300;
+                setTimeout(typeEffect, typingSpeed);
+            }
+            typeEffect();
+
+            // --- Hàm điều hướng trang ---
+            function showPage(pageName) {
+                Object.values(pages).forEach(page => page.classList.add('hidden'));
+                pages[pageName].classList.remove('hidden');
+            }
+
+            // --- Hàm hiển thị/ẩn Modal ---
+            function showModal(modalName, show = true) {
+                modals[modalName].classList.toggle('hidden', !show);
+            }
+            
+            // --- Logic xử lý chính ---
+
+            // Xử lý gửi tên ở trang chủ
+            buttons.nameForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                if (!db) return; // Không làm gì nếu không có kết nối db
+                const enteredName = inputs.name.value.trim();
+                
+                if (!enteredName) return;
+
+                if (enteredName === state.adminPassword) {
+                    showPage('admin');
+                    inputs.name.value = '';
+                    return;
+                }
+
+                // Chuẩn hóa tên để so sánh (bỏ dấu và viết thường)
+                const normalize = (str) => str.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+                const isInitialName = state.validNames.some(name => normalize(name) === normalize(enteredName));
+
+                try {
+                    const docRef = doc(db, "greetings", enteredName);
+                    const docSnap = await getDoc(docRef);
+
+                    if (isInitialName || docSnap.exists()) {
+                        displayGreeting(enteredName, docSnap.data());
+                        showPage('greeting');
+                    } else {
+                        showModal('error');
+                    }
+                } catch (error) {
+                    console.error("Error fetching greeting:", error);
+                    displays.statusMessage.textContent = "Lỗi: Không thể tải lời chúc.";
+                    displays.statusMessage.className = 'font-semibold mb-4 h-6 text-red-500';
+                }
+                
+                inputs.name.value = '';
+            });
+
+            // Hiển thị lời chúc
+            function displayGreeting(name, data) {
+                const greetingData = data || {
+                    wish: "Chúc bạn một ngày 20/10 thật nhiều niềm vui, hạnh phúc và luôn xinh đẹp rạng ngời. Hãy luôn mỉm cười và tỏa sáng nhé!",
+                    images: []
+                };
+
+                displays.recipientName.textContent = `Gửi ${name} yêu thương,`;
+                displays.wish.textContent = greetingData.wish;
+                
+                displays.images.innerHTML = '';
+                if (greetingData.images && greetingData.images.length > 0) {
+                    let gridClasses = 'grid-cols-1';
+                    if (greetingData.images.length === 2) gridClasses = 'sm:grid-cols-2';
+                    else if (greetingData.images.length >= 3) gridClasses = 'sm:grid-cols-3';
+                    displays.images.className = `grid ${gridClasses} gap-4`;
+
+                    greetingData.images.forEach(imgData => {
+                        const imgWrapper = document.createElement('div');
+                        imgWrapper.className = 'overflow-hidden rounded-xl shadow-lg';
+                        const img = document.createElement('img');
+                        img.src = imgData;
+                        img.className = 'w-full h-full object-cover transform hover:scale-110 transition-transform duration-300';
+                        imgWrapper.appendChild(img);
+                        displays.images.appendChild(imgWrapper);
+                    });
+                }
+            }
+            
+            buttons.retry.addEventListener('click', () => showModal('error', false));
+
+            buttons.backToHome.addEventListener('click', () => {
+                displays.statusMessage.textContent = '';
+                showPage('home');
+            });
+
+            // --- Logic trang Admin ---
+
+            inputs.image.addEventListener('change', (e) => {
+                state.tempImages = [];
+                displays.imagePreview.innerHTML = '';
+                const files = Array.from(e.target.files).slice(0, 3);
+
+                files.forEach(file => {
+                    const reader = new FileReader();
+                    reader.onload = (event) => {
+                        state.tempImages.push(event.target.result);
+                        const img = document.createElement('img');
+                        img.src = event.target.result;
+                        img.className = 'h-24 w-24 object-cover rounded-lg shadow-md';
+                        displays.imagePreview.appendChild(img);
+                    };
+                    reader.readAsDataURL(file);
+                });
+            });
+
+            buttons.saveWish.addEventListener('click', () => {
+                state.tempWish = inputs.wish.value;
+                if (!state.tempWish) {
+                    inputs.wish.classList.add('border-red-500', 'animate-shake');
+                    setTimeout(() => inputs.wish.classList.remove('border-red-500', 'animate-shake'), 500);
+                    return;
+                }
+                showModal('confirm');
+            });
+
+            buttons.back.addEventListener('click', () => showModal('confirm', false));
+            buttons.continue.addEventListener('click', () => {
+                showModal('confirm', false);
+                showModal('recipient');
+            });
+
+            buttons.ok.addEventListener('click', async () => {
+                const recipientName = inputs.recipientName.value.trim();
+                if (!recipientName) {
+                    inputs.recipientName.classList.add('border-red-500', 'animate-shake');
+                    setTimeout(() => inputs.recipientName.classList.remove('border-red-500', 'animate-shake'), 500);
+                    return;
+                }
+                
+                const newGreeting = { wish: state.tempWish, images: state.tempImages };
+
+                try {
+                    await setDoc(doc(db, "greetings", recipientName), newGreeting);
+                    
+                    inputs.wish.value = '';
+                    inputs.image.value = '';
+                    displays.imagePreview.innerHTML = '';
+                    state.tempImages = [];
+                    state.tempWish = '';
+                    inputs.recipientName.value = '';
+                    
+                    showModal('recipient', false);
+                    showPage('home');
+                    displays.statusMessage.textContent = `Lời chúc của bạn đã được lưu!`;
+                    displays.statusMessage.className = 'font-semibold mb-4 h-6 text-green-600';
+
+                } catch (error) {
+                    console.error("Error saving greeting: ", error);
+                    showModal('recipient', false);
+                    showPage('home');
+                    displays.statusMessage.textContent = "Lỗi: Không thể lưu lời chúc.";
+                    displays.statusMessage.className = 'font-semibold mb-4 h-6 text-red-500';
+                }
+            });
+        });
+    </script>
+</body>
+</html>
+
