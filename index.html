@@ -9,418 +9,482 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        /* Kiểu chữ thướt tha cho tiêu đề */
-        .font-dancing {
-            font-family: 'Dancing Script', cursive;
-        }
-
-        /* Hiệu ứng gradient và lấp lánh cho chữ - ĐÃ LÀM ĐẬM HƠN */
+        .font-dancing { font-family: 'Dancing Script', cursive; }
         .animated-text {
-            /* Thay đổi màu sang các tông đậm hơn */
             background: linear-gradient(45deg, #be185d, #ef4444, #be185d);
             background-size: 200% 200%;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             animation: gradient-animation 4s ease infinite, sparkle 2s infinite;
         }
-
-        @keyframes gradient-animation {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-
-        @keyframes sparkle {
-             /* Tăng cường hiệu ứng đổ bóng với màu đậm hơn */
-            0%, 100% { text-shadow: 0 0 5px #fff, 0 0 10px #fce7f3, 0 0 15px #f472b6, 0 0 20px #f472b6; }
-            50% { text-shadow: 0 0 10px #fff, 0 0 15px #f0abfc, 0 0 20px #db2777, 0 0 25px #db2777; }
-        }
-
-        /* Video nền */
-        #bg-video {
-            position: fixed;
-            right: 0;
-            bottom: 0;
-            min-width: 100%;
-            min-height: 100%;
-            z-index: -2;
-            object-fit: cover;
-        }
-
-        /* Lớp phủ mờ trên video để chữ dễ đọc hơn */
-        .video-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(255, 255, 255, 0.4);
-            z-index: -1;
-        }
-        
-        /* Hiệu ứng rung lắc khi nhập liệu sai */
-        @keyframes shake {
-          10%, 90% { transform: translate3d(-1px, 0, 0); }
-          20%, 80% { transform: translate3d(2px, 0, 0); }
-          30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
-          40%, 60% { transform: translate3d(4px, 0, 0); }
-        }
-        .animate-shake {
-            animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
-        }
+        @keyframes gradient-animation { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+        @keyframes sparkle { 0%, 100% { text-shadow: 0 0 5px #fff, 0 0 10px #fce7f3, 0 0 15px #f472b6, 0 0 20px #f472b6; } 50% { text-shadow: 0 0 10px #fff, 0 0 15px #f0abfc, 0 0 20px #db2777, 0 0 25px #db2777; } }
+        @keyframes shake { 10%, 90% { transform: translate3d(-1px, 0, 0); } 20%, 80% { transform: translate3d(2px, 0, 0); } 30%, 50%, 70% { transform: translate3d(-4px, 0, 0); } 40%, 60% { transform: translate3d(4px, 0, 0); } }
+        .animate-shake { animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .page-content { animation: fadeIn 0.6s ease-out forwards; }
+        .petal { position: absolute; top: -50px; background-color: #fecdd3; border-radius: 50% 0; opacity: 0.7; animation: fall linear infinite; }
+        @keyframes fall { to { transform: translateY(100vh) rotate(720deg); opacity: 0; } }
+        #bg-video { position: fixed; right: 0; bottom: 0; min-width: 100%; min-height: 100%; z-index: -2; object-fit: cover; }
+        #video-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(255, 255, 255, 0.4); z-index: -1; }
+        .tooltip { position: relative; display: inline-block; }
+        .tooltip .tooltiptext { visibility: hidden; width: 220px; background-color: #555; color: #fff; text-align: center; border-radius: 6px; padding: 5px; position: absolute; z-index: 1; bottom: 125%; left: 50%; margin-left: -110px; opacity: 0; transition: opacity 0.3s; }
+        .tooltip:hover .tooltiptext { visibility: visible; opacity: 1; }
+        .word-span { opacity: 0; transition: opacity 0.5s ease; }
     </style>
 </head>
-<body class="bg-gray-100 text-gray-800">
+<body class="bg-gradient-to-br from-rose-100 to-pink-200 text-gray-800">
 
-    <video autoplay muted loop id="bg-video">
-        <!-- Thay thế bằng link video của bạn nếu muốn -->
+    <video autoplay muted loop playsinline id="bg-video" class="hidden">
         <source src="images/Hình nền động dành cho PC - Video Wallpaper - 03.mp4" type="video/mp4">
-        Your browser does not support the video tag.
     </video>
-    <div class="video-overlay"></div>
+    <div id="video-overlay" class="hidden"></div>
+    <audio id="music-player" class="hidden"></audio>
 
     <div id="app-container" class="min-h-screen flex items-center justify-center p-4">
         
-        <!-- Trang Chủ -->
-        <div id="home-page" class="w-full max-w-lg text-center">
-            <h1 id="typing-text" class="text-8xl md:text-9xl font-bold animated-text font-dancing mb-8 min-h-[120px]"></h1>
-            <p id="status-message" class="font-semibold mb-4 h-6"></p>
+        <div id="home-page" class="w-full max-w-lg text-center page-content">
+             <p id="status-message" class="font-semibold mb-4 h-6"></p>
             <form id="name-form" class="relative">
-                <input type="text" id="name-input" placeholder="Hãy nhập vào tên của bạn" class="w-full px-6 py-4 text-lg bg-white bg-opacity-80 border-2 border-pink-300 rounded-full focus:outline-none focus:ring-4 focus:ring-pink-400 focus:border-pink-500 transition-all duration-300 shadow-lg" autocomplete="off">
-                <div class="absolute right-4 top-1/2 -translate-y-1/2 text-pink-400 text-3xl">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24" 24" fill="currentColor"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5C2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3C19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
-                </div>
+                <input type="text" id="name-input" placeholder="Hãy nhập vào tên của bạn..." class="w-full px-6 py-4 text-lg bg-white bg-opacity-80 border-2 border-pink-300 rounded-full focus:outline-none focus:ring-4 focus:ring-pink-400 focus:border-pink-500 transition-all duration-300 shadow-lg" autocomplete="off">
+                <div class="absolute right-4 top-1/2 -translate-y-1/2 text-pink-400 text-3xl"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="currentColor"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5C2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3C19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg></div>
             </form>
             <button type="submit" form="name-form" class="mt-6 px-12 py-3 bg-pink-500 text-white font-bold text-xl rounded-full hover:bg-pink-600 transition-transform transform hover:scale-105 shadow-xl">Gửi</button>
         </div>
 
-        <!-- Trang Nhập Lời Chúc (Admin) -->
-        <div id="admin-page" class="w-full max-w-2xl text-center bg-white bg-opacity-90 p-8 rounded-2xl shadow-2xl hidden">
+        <div id="admin-page" class="w-full max-w-2xl text-center bg-white/50 backdrop-blur-xl border border-white/30 p-8 rounded-2xl shadow-2xl shadow-pink-200/50 hidden relative page-content">
+            <button id="admin-back-btn" class="absolute top-4 left-4 text-pink-500 hover:text-pink-700 text-3xl z-10"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="currentColor" d="M20 11H7.83l5.59-5.59L12 4l-8 8l8 8l1.41-1.41L7.83 13H20v-2z"></path></svg></button>
             <h1 class="text-7xl md:text-8xl font-bold animated-text font-dancing mb-6">20/10</h1>
-            <textarea id="wish-input" class="w-full h-40 p-4 border-2 border-pink-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-400 mb-4" placeholder="Hãy nhập lời chúc cho người yêu thương của bạn"></textarea>
-            <div class="mb-4">
-                <label for="image-upload" class="cursor-pointer inline-block px-6 py-3 bg-rose-400 text-white rounded-lg hover:bg-rose-500">Tải ảnh (tối đa 3)</label>
-                <input type="file" id="image-upload" multiple accept="image/*" class="hidden">
+            <div class="text-right text-sm text-gray-600 mb-2">
+                <span id="word-count">0</span> / 250 từ
             </div>
-            <div id="image-preview" class="flex justify-center gap-4 mb-6"></div>
-            <button id="save-wish-btn" class="w-full px-12 py-3 bg-pink-500 text-white font-bold text-xl rounded-full hover:bg-pink-600 transition-transform transform hover:scale-105 shadow-xl">Lưu</button>
+            <textarea id="wish-input" class="w-full h-40 p-4 bg-white/70 border-2 border-pink-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-400 mb-4" placeholder="Hãy nhập lời chúc cho người yêu thương của bạn"></textarea>
+            
+            <div class="flex flex-wrap justify-center items-center gap-4 mb-4">
+                <div>
+                    <label for="image-upload" class="cursor-pointer inline-block px-6 py-3 bg-rose-400 text-white rounded-lg hover:bg-rose-500">Tải ảnh (tối đa 3)</label>
+                    <input type="file" id="image-upload" multiple accept="image/*" class="hidden">
+                </div>
+                <div class="flex items-center gap-2">
+                    <label for="music-upload" class="cursor-pointer inline-block px-6 py-3 bg-sky-400 text-white rounded-lg hover:bg-sky-500">Tải nhạc</label>
+                    <input type="file" id="music-upload" accept="audio/*" class="hidden">
+                    <div class="tooltip"><svg class="w-6 h-6 text-sky-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"></path></svg><span class="tooltiptext">Tải bài hát nền. Lời chúc sẽ hiện ra từ từ theo giai điệu.</span></div>
+                </div>
+                <div class="flex items-center gap-2">
+                     <button id="mic-btn" class="px-6 py-3 bg-teal-400 text-white rounded-lg hover:bg-teal-500">Nhập giọng nói</button>
+                     <div class="tooltip"><svg class="w-6 h-6 text-teal-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"></path></svg><span class="tooltiptext">Dùng giọng nói để nhập lời chúc. Trình duyệt của bạn có thể sẽ hỏi xin quyền truy cập micro.</span></div>
+                </div>
+            </div>
+
+            <div id="image-preview" class="flex justify-center gap-4 mb-6 min-h-[100px]"></div>
+            <div id="music-preview" class="text-gray-600 mb-6 h-6"></div>
+            
+            <div class="flex flex-col sm:flex-row gap-4">
+                <button id="save-wish-btn" class="w-full px-12 py-3 bg-pink-500 text-white font-bold text-xl rounded-full hover:bg-pink-600 transition-transform transform hover:scale-105 shadow-xl">Lưu</button>
+                <button id="delete-wish-btn" class="w-full px-12 py-3 bg-red-600 text-white font-bold text-xl rounded-full hover:bg-red-700 transition-transform transform hover:scale-105 shadow-xl hidden">Xóa Lời Chúc</button>
+            </div>
         </div>
 
-        <!-- Trang Chứa Lời Chúc -->
-        <div id="greeting-page" class="w-full max-w-4xl bg-white bg-opacity-95 p-6 md:p-10 rounded-3xl shadow-2xl text-center hidden">
-             <h1 class="text-6xl md:text-7xl font-bold animated-text font-dancing mb-4">20/10</h1>
+        <div id="greeting-page" class="w-full max-w-4xl bg-white/50 backdrop-blur-xl border border-white/30 p-6 md:p-10 rounded-3xl shadow-2xl shadow-pink-200/50 text-center hidden relative page-content">
+            <div id="petal-container" class="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none"></div>
+            <h1 class="text-6xl md:text-7xl font-bold animated-text font-dancing mb-4">20/10</h1>
             <h2 id="recipient-name-display" class="text-3xl font-semibold text-gray-700 mb-6"></h2>
-            <div class="bg-rose-50 p-6 rounded-2xl border-l-4 border-rose-400 mb-6">
+            <div class="bg-white/60 p-6 rounded-2xl border-l-4 border-rose-400 mb-6">
                 <p id="wish-display" class="text-lg text-gray-600 leading-relaxed whitespace-pre-wrap"></p>
             </div>
             <div id="images-display" class="grid grid-cols-1 md:grid-cols-3 gap-4"></div>
-             <button id="back-to-home-btn" class="mt-8 px-8 py-2 bg-pink-500 text-white font-bold rounded-full hover:bg-pink-600 transition-transform transform hover:scale-105 shadow-lg">Quay về trang chủ</button>
+            <p id="giver-display" class="text-right mt-6 text-lg italic text-gray-600"></p>
+            <button id="back-to-home-btn" class="mt-8 px-8 py-2 bg-pink-500 text-white font-bold rounded-full hover:bg-pink-600 transition-transform transform hover:scale-105 shadow-lg">Quay về trang chủ</button>
+        </div>
+        
+        <div id="list-page" class="w-full max-w-2xl bg-white/50 backdrop-blur-xl border border-white/30 p-8 rounded-2xl shadow-2xl shadow-pink-200/50 hidden relative page-content">
+             <button id="list-back-btn" class="absolute top-4 left-4 text-pink-500 hover:text-pink-700 text-3xl z-10"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="currentColor" d="M20 11H7.83l5.59-5.59L12 4l-8 8l8 8l1.41-1.41L7.83 13H20v-2z"></path></svg></button>
+             <h2 class="text-4xl font-bold text-pink-600 mb-6 text-center">Danh Sách Lời Chúc</h2>
+             <div id="greetings-list-container" class="space-y-2 max-h-96 overflow-y-auto"></div>
         </div>
 
-        <!-- Modal Báo Lỗi -->
-        <div id="error-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 hidden">
-            <div class="bg-white p-8 rounded-2xl shadow-2xl text-center">
-                <p class="text-xl text-red-500 mb-6">Tên này chưa có lời chúc nào. <br> Bạn hãy thử lại nhé!</p>
-                <button id="retry-btn" class="px-8 py-2 bg-red-500 text-white font-bold rounded-full hover:bg-red-600">Nhập lại</button>
-            </div>
-        </div>
-        
-        <!-- Modal Xác Nhận Lưu -->
-        <div id="confirm-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 hidden">
-            <div class="bg-white p-8 rounded-2xl shadow-2xl text-center">
-                <p class="text-xl mb-6">Bạn chắc chắn lưu lại lời yêu thương này chứ?</p>
-                <div class="flex gap-4 justify-center">
-                    <button id="back-btn" class="px-8 py-2 bg-gray-400 text-white font-bold rounded-full hover:bg-gray-500">Quay lại</button>
-                    <button id="continue-btn" class="px-8 py-2 bg-pink-500 text-white font-bold rounded-full hover:bg-pink-600">Tiếp tục</button>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Modal Nhập Tên Người Nhận -->
-        <div id="recipient-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 hidden">
-            <div class="bg-white p-8 rounded-2xl shadow-2xl text-center">
-                <p class="text-xl mb-4">Hãy nhập tên người yêu thương của bạn</p>
-                <input type="text" id="recipient-name-input" class="w-full px-4 py-2 border-2 border-pink-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-400 mb-4" />
-                <button id="ok-btn" class="px-8 py-2 bg-pink-500 text-white font-bold rounded-full hover:bg-pink-600">OK</button>
-            </div>
-        </div>
+        <!-- Các Modals -->
+        <div id="error-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 hidden z-50"><div class="bg-white p-8 rounded-2xl shadow-2xl text-center"><p id="error-message" class="text-xl text-red-500 mb-6"></p><button id="retry-btn" class="px-8 py-2 bg-red-500 text-white font-bold rounded-full hover:bg-red-600">Nhập lại</button></div></div>
+        <div id="confirm-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 hidden z-50"><div class="bg-white p-8 rounded-2xl shadow-2xl text-center"><p class="text-xl mb-6">Bạn chắc chắn lưu lại lời yêu thương này chứ?</p><div class="flex gap-4 justify-center"><button id="back-btn" class="px-8 py-2 bg-gray-400 text-white font-bold rounded-full hover:bg-gray-500">Quay lại</button><button id="continue-btn" class="px-8 py-2 bg-pink-500 text-white font-bold rounded-full hover:bg-pink-600">Tiếp tục</button></div></div></div>
+        <div id="giver-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 hidden z-50"><div class="bg-white p-8 rounded-2xl shadow-2xl text-center"><p class="text-xl mb-4">Hãy nhập tên của bạn (người gửi)</p><input type="text" id="giver-name-input" class="w-full px-4 py-2 border-2 border-pink-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-400 mb-4" /><button id="giver-ok-btn" class="px-8 py-2 bg-pink-500 text-white font-bold rounded-full hover:bg-pink-600">Tiếp theo</button></div></div>
+        <div id="recipient-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 hidden z-50"><div class="bg-white p-8 rounded-2xl shadow-2xl text-center"><p class="text-xl mb-4">Hãy nhập tên người yêu thương của bạn</p><input type="text" id="recipient-name-input" class="w-full px-4 py-2 border-2 border-pink-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-400 mb-4" /><button id="ok-btn" class="px-8 py-2 bg-pink-500 text-white font-bold rounded-full hover:bg-pink-600">OK</button></div></div>
+        <div id="delete-confirm-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 hidden z-50"><div class="bg-white p-8 rounded-2xl shadow-2xl text-center"><p class="text-xl mb-6">Bạn có chắc chắn muốn xóa lời chúc này? <br> Hành động này không thể hoàn tác.</p><div class="flex gap-4 justify-center"><button id="cancel-delete-btn" class="px-8 py-2 bg-gray-400 text-white font-bold rounded-full hover:bg-gray-500">Hủy</button><button id="confirm-delete-btn" class="px-8 py-2 bg-red-600 text-white font-bold rounded-full hover:bg-red-700">Xóa</button></div></div></div>
+        <!-- Modal Gợi ý -->
+        <div id="suggestion-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 hidden z-50"><div class="bg-white p-8 rounded-2xl shadow-2xl text-center"><p id="suggestion-message" class="text-xl text-sky-600 mb-6"></p><div class="flex gap-4 justify-center"><button id="suggestion-back-btn" class="px-8 py-2 bg-gray-400 text-white font-bold rounded-full hover:bg-gray-500">Sửa lại</button><button id="suggestion-continue-btn" class="px-8 py-2 bg-pink-500 text-white font-bold rounded-full hover:bg-pink-600">Vẫn lưu</button></div></div></div>
     </div>
 
     <script type="module">
-        // --- Import Firebase ---
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, doc, getDoc, setDoc, deleteDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firestore.js";
         import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 
-        document.addEventListener('DOMContentLoaded', async () => {
-            // --- Firebase Initialization ---
+        document.addEventListener('DOMContentLoaded', () => { // Changed: No longer async
+            // Define all constants and variables
+            const pages = { home: document.getElementById('home-page'), admin: document.getElementById('admin-page'), greeting: document.getElementById('greeting-page'), list: document.getElementById('list-page') };
+            const modals = { error: document.getElementById('error-modal'), confirm: document.getElementById('confirm-modal'), giver: document.getElementById('giver-modal'), recipient: document.getElementById('recipient-modal'), deleteConfirm: document.getElementById('delete-confirm-modal'), suggestion: document.getElementById('suggestion-modal') };
+            const inputs = { name: document.getElementById('name-input'), wish: document.getElementById('wish-input'), image: document.getElementById('image-upload'), music: document.getElementById('music-upload'), giverName: document.getElementById('giver-name-input'), recipientName: document.getElementById('recipient-name-input') };
+            const buttons = { nameForm: document.getElementById('name-form'), retry: document.getElementById('retry-btn'), saveWish: document.getElementById('save-wish-btn'), deleteWish: document.getElementById('delete-wish-btn'), back: document.getElementById('back-btn'), continue: document.getElementById('continue-btn'), giverOk: document.getElementById('giver-ok-btn'), ok: document.getElementById('ok-btn'), backToHome: document.getElementById('back-to-home-btn'), adminBack: document.getElementById('admin-back-btn'), listBack: document.getElementById('list-back-btn'), mic: document.getElementById('mic-btn'), cancelDelete: document.getElementById('cancel-delete-btn'), confirmDelete: document.getElementById('confirm-delete-btn'), suggestionBack: document.getElementById('suggestion-back-btn'), suggestionContinue: document.getElementById('suggestion-continue-btn') };
+            const displays = { statusMessage: document.getElementById('status-message'), errorMessage: document.getElementById('error-message'), imagePreview: document.getElementById('image-preview'), musicPreview: document.getElementById('music-preview'), recipientName: document.getElementById('recipient-name-display'), wish: document.getElementById('wish-display'), images: document.getElementById('images-display'), giver: document.getElementById('giver-display'), greetingsList: document.getElementById('greetings-list-container'), wordCount: document.getElementById('word-count') };
+            const musicPlayer = document.getElementById('music-player');
+            const state = { adminPassword: '24050117', tempWish: '', tempImages: [], tempMusic: null, tempMusicName: '', tempGiver: '', editingName: null, animationInterval: null };
+            const MIN_WORDS_WITH_MUSIC = 40;
+            const MAX_WORDS = 250;
+            let db; // The database instance, initialized later
 
-            // Cấu hình Firebase của bạn - ĐÃ SỬA LẠI CHO CHÍNH XÁC
-            const userFirebaseConfig = {
-                apiKey: "AIzaSyBZO8E51RXCAeeWQNNKpLFZn8D3NaousUg",
-                authDomain: "oi-chuc-20-10.firebaseapp.com",
-                projectId: "oi-chuc-20-10",
-                storageBucket: "oi-chuc-20-10.firebasestorage.app",
-                messagingSenderId: "336530894385",
-                appId: "1:336530894385:web:b2534d9962a49898d96f10",
-                measurementId: "G-6DGPHX4ZN8"
-            };
-
-            let db;
-            try {
-                // Ưu tiên sử dụng cấu hình do Canvas cung cấp. Nếu không có, dùng cấu hình của người dùng.
-                const configToUse = typeof __firebase_config !== 'undefined' && __firebase_config
-                    ? JSON.parse(__firebase_config)
-                    : userFirebaseConfig;
-
-                // Kiểm tra xem cấu hình có hợp lệ không
-                if (!configToUse || !configToUse.apiKey) {
-                    throw new Error("Firebase config is missing. Please provide it in userFirebaseConfig if running outside Canvas.");
-                }
-
-                const app = initializeApp(configToUse);
-                db = getFirestore(app);
-                const auth = getAuth(app);
-
-                // Sử dụng auth token của Canvas nếu có, nếu không thì đăng nhập ẩn danh
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    await signInWithCustomToken(auth, __initial_auth_token);
-                } else {
-                    await signInAnonymously(auth);
-                }
-                
-                console.log("Firebase connected successfully!");
-            } catch (e) {
-                console.error("Firebase initialization failed:", e);
-                const statusMsg = document.getElementById('status-message');
-                statusMsg.textContent = "Lỗi kết nối cơ sở dữ liệu.";
-                statusMsg.classList.add('text-red-500');
-                // Vô hiệu hóa form nếu không có kết nối
-                document.getElementById('name-form').addEventListener('submit', (ev) => ev.preventDefault());
-                document.querySelector('button[form="name-form"]').disabled = true;
-            }
-
-            // --- Quản lý các phần tử DOM ---
-            const pages = {
-                home: document.getElementById('home-page'),
-                admin: document.getElementById('admin-page'),
-                greeting: document.getElementById('greeting-page')
-            };
-            const modals = {
-                error: document.getElementById('error-modal'),
-                confirm: document.getElementById('confirm-modal'),
-                recipient: document.getElementById('recipient-modal')
-            };
-            const inputs = {
-                name: document.getElementById('name-input'),
-                wish: document.getElementById('wish-input'),
-                image: document.getElementById('image-upload'),
-                recipientName: document.getElementById('recipient-name-input')
-            };
-            const buttons = {
-                nameForm: document.getElementById('name-form'),
-                retry: document.getElementById('retry-btn'),
-                saveWish: document.getElementById('save-wish-btn'),
-                back: document.getElementById('back-btn'),
-                continue: document.getElementById('continue-btn'),
-                ok: document.getElementById('ok-btn'),
-                backToHome: document.getElementById('back-to-home-btn')
-            };
-            const displays = {
-                statusMessage: document.getElementById('status-message'),
-                imagePreview: document.getElementById('image-preview'),
-                recipientName: document.getElementById('recipient-name-display'),
-                wish: document.getElementById('wish-display'),
-                images: document.getElementById('images-display')
-            };
-
-            // --- Quản lý trạng thái ứng dụng ---
-            const state = {
-                validNames: ['Trần Thị Kim Hiền', 'Trần Thị Trúc Loan', 'Trương Kim Ngần', 'Cao Thị Huyền Trân'],
-                adminPassword: '24050117',
-                tempWish: '',
-                tempImages: []
-            };
-
-            // --- Hiệu ứng gõ chữ (Đã sửa lỗi) ---
-            const typingTextElement = document.getElementById('typing-text');
-            const textToType = "20/10";
-            let typingIndex = 0;
-            let isDeleting = false;
-
-            function typeEffect() {
-                const currentText = textToType.substring(0, typingIndex);
-                typingTextElement.textContent = currentText || '\u00A0'; // Dùng ký tự không ngắt dòng để giữ chiều cao
-
-                if (!isDeleting && typingIndex < textToType.length) {
-                    typingIndex++;
-                } else if (isDeleting && typingIndex > 0) {
-                    typingIndex--;
-                } else {
-                    isDeleting = !isDeleting;
-                    setTimeout(typeEffect, isDeleting ? 3000 : 1000); // Tạm dừng khi gõ xong hoặc xóa xong
-                    return;
-                }
-                const typingSpeed = isDeleting ? 150 : 300;
-                setTimeout(typeEffect, typingSpeed);
-            }
-            typeEffect();
-
-            // --- Hàm điều hướng trang ---
+            // Define all functions
             function showPage(pageName) {
                 Object.values(pages).forEach(page => page.classList.add('hidden'));
                 pages[pageName].classList.remove('hidden');
-            }
-
-            // --- Hàm hiển thị/ẩn Modal ---
-            function showModal(modalName, show = true) {
-                modals[modalName].classList.toggle('hidden', !show);
-            }
-            
-            // --- Logic xử lý chính ---
-
-            // Xử lý gửi tên ở trang chủ
-            buttons.nameForm.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                if (!db) return; // Không làm gì nếu không có kết nối db
-                const enteredName = inputs.name.value.trim();
                 
-                if (!enteredName) return;
-
-                if (enteredName === state.adminPassword) {
-                    showPage('admin');
-                    inputs.name.value = '';
-                    return;
+                const bgVideo = document.getElementById('bg-video');
+                const videoOverlay = document.getElementById('video-overlay');
+                if (pageName === 'home') {
+                    bgVideo.classList.add('hidden');
+                    videoOverlay.classList.add('hidden');
+                    document.body.className = 'bg-gradient-to-br from-rose-100 to-pink-200 text-gray-800';
+                } else {
+                    bgVideo.classList.remove('hidden');
+                    videoOverlay.classList.remove('hidden');
+                    document.body.className = 'text-gray-800';
                 }
+                
+                if (pageName === 'greeting') createPetals();
+            }
 
-                // Chuẩn hóa tên để so sánh (bỏ dấu và viết thường)
-                const normalize = (str) => str.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-                const isInitialName = state.validNames.some(name => normalize(name) === normalize(enteredName));
+            function showModal(modalName, show = true) { modals[modalName].classList.toggle('hidden', !show); }
+            function resetAdminForm() {
+                inputs.wish.value = ''; inputs.image.value = ''; inputs.music.value = '';
+                displays.imagePreview.innerHTML = ''; displays.musicPreview.textContent = ''; displays.wordCount.textContent = '0';
+                state.tempImages = []; state.tempWish = ''; state.tempMusic = null; state.tempMusicName = ''; state.editingName = null; state.tempGiver = '';
+                buttons.saveWish.textContent = 'Lưu';
+                buttons.deleteWish.classList.add('hidden');
+            }
 
-                try {
-                    const docRef = doc(db, "greetings", enteredName);
-                    const docSnap = await getDoc(docRef);
+            function createPetals() {
+                const container = document.getElementById('petal-container');
+                if (!container) return;
+                container.innerHTML = '';
+                for (let i = 0; i < 30; i++) {
+                    const petal = document.createElement('div');
+                    petal.className = 'petal';
+                    const size = Math.random() * 15 + 5;
+                    petal.style.width = `${size}px`; petal.style.height = `${size}px`;
+                    petal.style.left = `${Math.random() * 100}vw`;
+                    petal.style.animationDuration = `${Math.random() * 5 + 7}s`;
+                    petal.style.animationDelay = `${Math.random() * 5}s`;
+                    if (Math.random() > 0.7) petal.style.backgroundColor = '#fb7185';
+                    container.appendChild(petal);
+                }
+            }
 
-                    if (isInitialName || docSnap.exists()) {
-                        displayGreeting(enteredName, docSnap.data());
-                        showPage('greeting');
+            function animateText(text, musicDuration) {
+                const words = text.split(/\s+/).filter(Boolean);
+                displays.wish.innerHTML = words.map(word => `<span class="word-span">${word}</span>`).join(' ');
+                
+                const wordSpans = displays.wish.querySelectorAll('.word-span');
+                const delay = musicDuration ? (musicDuration * 1000) / words.length : 100;
+
+                let i = 0;
+                clearInterval(state.animationInterval);
+                state.animationInterval = setInterval(() => {
+                    if (i < wordSpans.length) {
+                        wordSpans[i].style.opacity = '1';
+                        i++;
                     } else {
-                        showModal('error');
+                        clearInterval(state.animationInterval);
                     }
-                } catch (error) {
-                    console.error("Error fetching greeting:", error);
-                    displays.statusMessage.textContent = "Lỗi: Không thể tải lời chúc.";
-                    displays.statusMessage.className = 'font-semibold mb-4 h-6 text-red-500';
-                }
-                
-                inputs.name.value = '';
-            });
+                }, delay);
+            }
 
-            // Hiển thị lời chúc
             function displayGreeting(name, data) {
-                const greetingData = data || {
-                    wish: "Chúc bạn một ngày 20/10 thật nhiều niềm vui, hạnh phúc và luôn xinh đẹp rạng ngời. Hãy luôn mỉm cười và tỏa sáng nhé!",
-                    images: []
-                };
-
                 displays.recipientName.textContent = `Gửi ${name} yêu thương,`;
-                displays.wish.textContent = greetingData.wish;
-                
+                displays.wish.textContent = data.wish;
                 displays.images.innerHTML = '';
-                if (greetingData.images && greetingData.images.length > 0) {
-                    let gridClasses = 'grid-cols-1';
-                    if (greetingData.images.length === 2) gridClasses = 'sm:grid-cols-2';
-                    else if (greetingData.images.length >= 3) gridClasses = 'sm:grid-cols-3';
-                    displays.images.className = `grid ${gridClasses} gap-4`;
+                displays.giver.textContent = data.giverName ? `Từ: ${data.giverName}` : '';
+                
+                if (data.musicDataUrl) {
+                    musicPlayer.src = data.musicDataUrl;
+                    musicPlayer.onloadedmetadata = () => {
+                        let duration = musicPlayer.duration;
+                        if (duration > 60) duration = 60;
+                        musicPlayer.play();
+                        animateText(data.wish, duration);
+                    };
+                } else {
+                    animateText(data.wish, null);
+                }
 
-                    greetingData.images.forEach(imgData => {
-                        const imgWrapper = document.createElement('div');
-                        imgWrapper.className = 'overflow-hidden rounded-xl shadow-lg';
-                        const img = document.createElement('img');
-                        img.src = imgData;
-                        img.className = 'w-full h-full object-cover transform hover:scale-110 transition-transform duration-300';
-                        imgWrapper.appendChild(img);
-                        displays.images.appendChild(imgWrapper);
+                if (data.images && data.images.length > 0) {
+                    let gridClasses = 'grid-cols-1';
+                    if (data.images.length === 2) gridClasses = 'sm:grid-cols-2';
+                    else if (data.images.length >= 3) gridClasses = 'sm:grid-cols-3';
+                    displays.images.className = `grid ${gridClasses} gap-4`;
+                    data.images.forEach(imgData => {
+                        const imgWrapper = document.createElement('div'); imgWrapper.className = 'overflow-hidden rounded-xl shadow-lg';
+                        const img = document.createElement('img'); img.src = imgData; img.className = 'w-full h-full object-cover transform hover:scale-110 transition-transform duration-300';
+                        imgWrapper.appendChild(img); displays.images.appendChild(imgWrapper);
                     });
                 }
             }
             
-            buttons.retry.addEventListener('click', () => showModal('error', false));
+            async function saveGreeting(name, wish, images, musicDataUrl, musicName, giverName) {
+                try {
+                    await setDoc(doc(db, "greetings", name), { wish, images, musicDataUrl, musicName, giverName });
+                    resetAdminForm(); showPage('home');
+                    displays.statusMessage.textContent = `Lời chúc của bạn đã được lưu!`;
+                    displays.statusMessage.className = 'font-semibold mb-4 h-6 text-green-600';
+                } catch (error) {
+                    console.error("Error saving greeting: ", error);
+                    displays.statusMessage.textContent = "Lỗi: Không thể lưu lời chúc.";
+                    displays.statusMessage.className = 'font-semibold mb-4 h-6 text-red-500';
+                }
+            }
+            
+            async function showGreetingsList() {
+                const querySnapshot = await getDocs(collection(db, "greetings"));
+                displays.greetingsList.innerHTML = '';
+                if(querySnapshot.empty){
+                    displays.greetingsList.innerHTML = '<p class="text-gray-500">Chưa có lời chúc nào được tạo.</p>';
+                    return;
+                }
+                querySnapshot.forEach((doc) => {
+                    const data = doc.data();
+                    const recipient = doc.id;
+                    const giver = data.giverName || 'Một người bạn';
+                    const listItem = document.createElement('div');
+                    listItem.className = 'bg-white/70 p-2 rounded-lg';
+                    listItem.textContent = `${giver}  ->  ${recipient}`;
+                    displays.greetingsList.appendChild(listItem);
+                });
+            }
 
+            const countWords = (str) => str.trim() === '' ? 0 : str.trim().split(/\s+/).length;
+            
+            const proceedWithSave = () => {
+                state.tempWish = inputs.wish.value;
+                if (state.editingName) {
+                    saveGreeting(state.editingName, state.tempWish, state.tempImages, state.tempMusic, state.tempMusicName, 'Người sửa');
+                } else {
+                    showModal('confirm');
+                }
+            };
+
+            // Attach all event listeners immediately
+            buttons.adminBack.addEventListener('click', () => { resetAdminForm(); showPage('home'); });
+            buttons.listBack.addEventListener('click', () => showPage('home'));
+            buttons.retry.addEventListener('click', () => showModal('error', false));
             buttons.backToHome.addEventListener('click', () => {
-                displays.statusMessage.textContent = '';
-                showPage('home');
+                musicPlayer.pause(); musicPlayer.currentTime = 0; clearInterval(state.animationInterval);
+                const petalContainer = document.getElementById('petal-container');
+                if(petalContainer) petalContainer.innerHTML = '';
+                displays.statusMessage.textContent = ''; showPage('home');
             });
 
-            // --- Logic trang Admin ---
+            buttons.nameForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const enteredName = inputs.name.value.trim();
+                if (!enteredName) return;
+
+                if (enteredName === state.adminPassword) {
+                    resetAdminForm();
+                    showPage('admin');
+                    inputs.name.value = '';
+                    return; 
+                }
+
+                if (!db) {
+                    displays.statusMessage.textContent = "Đang kết nối, vui lòng thử lại sau giây lát...";
+                    displays.statusMessage.className = 'font-semibold mb-4 h-6 text-orange-500';
+                    inputs.name.classList.add('animate-shake');
+                    setTimeout(() => inputs.name.classList.remove('animate-shake'), 500);
+                    return;
+                }
+                
+                const editPrefix = `${state.adminPassword}-`;
+
+                if (enteredName.toLowerCase() === 'show danh sách') {
+                    await showGreetingsList();
+                    showPage('list');
+                } else if (enteredName.startsWith(editPrefix)) {
+                    const nameToEdit = enteredName.substring(editPrefix.length);
+                    const docRef = doc(db, "greetings", nameToEdit);
+                    const docSnap = await getDoc(docRef);
+                    if (docSnap.exists()) {
+                        const data = docSnap.data();
+                        inputs.wish.value = data.wish; displays.wordCount.textContent = countWords(data.wish);
+                        displays.imagePreview.innerHTML = '';
+                        state.tempImages = data.images || [];
+                        state.tempImages.forEach(imgData => {
+                            const img = document.createElement('img'); img.src = imgData; img.className = 'h-24 w-24 object-cover rounded-lg shadow-md';
+                            displays.imagePreview.appendChild(img);
+                        });
+                        state.tempMusic = data.musicDataUrl || null;
+                        displays.musicPreview.textContent = data.musicName || '';
+                        state.editingName = nameToEdit;
+                        buttons.saveWish.textContent = 'Xác Nhận Sửa Đổi';
+                        buttons.deleteWish.classList.remove('hidden');
+                        showPage('admin');
+                    } else {
+                        displays.errorMessage.innerHTML = `Không tìm thấy lời chúc nào cho "${nameToEdit}".`;
+                        showModal('error');
+                    }
+                } else {
+                    const docRef = doc(db, "greetings", enteredName);
+                    const docSnap = await getDoc(docRef);
+                    if (docSnap.exists()) {
+                        displayGreeting(enteredName, docSnap.data());
+                        showPage('greeting');
+                    } else {
+                        displays.errorMessage.innerHTML = "Tên này chưa có lời chúc nào. <br> Bạn hãy thử lại nhé!";
+                        showModal('error');
+                    }
+                }
+                inputs.name.value = '';
+            });
 
             inputs.image.addEventListener('change', (e) => {
-                state.tempImages = [];
-                displays.imagePreview.innerHTML = '';
+                state.tempImages = []; displays.imagePreview.innerHTML = '';
                 const files = Array.from(e.target.files).slice(0, 3);
-
                 files.forEach(file => {
                     const reader = new FileReader();
                     reader.onload = (event) => {
                         state.tempImages.push(event.target.result);
-                        const img = document.createElement('img');
-                        img.src = event.target.result;
-                        img.className = 'h-24 w-24 object-cover rounded-lg shadow-md';
+                        const img = document.createElement('img'); img.src = event.target.result; img.className = 'h-24 w-24 object-cover rounded-lg shadow-md';
                         displays.imagePreview.appendChild(img);
                     };
                     reader.readAsDataURL(file);
                 });
             });
 
+            inputs.music.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    state.tempMusic = event.target.result;
+                    state.tempMusicName = file.name;
+                    displays.musicPreview.textContent = `Đã chọn: ${file.name}`;
+                };
+                reader.readAsDataURL(file);
+            });
+
+            inputs.wish.addEventListener('input', () => {
+                const text = inputs.wish.value;
+                const words = text.trim().split(/\s+/).filter(Boolean);
+                let wordCount = words.length;
+                if (wordCount > MAX_WORDS) {
+                    const trimmedText = words.slice(0, MAX_WORDS).join(' ');
+                    inputs.wish.value = trimmedText;
+                    wordCount = MAX_WORDS;
+                }
+                displays.wordCount.textContent = wordCount;
+            });
+
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (SpeechRecognition) {
+                const recognition = new SpeechRecognition();
+                recognition.continuous = false; recognition.lang = 'vi-VN'; recognition.interimResults = false;
+                buttons.mic.addEventListener('click', () => { buttons.mic.textContent = 'Đang nghe...'; buttons.mic.classList.add('bg-red-500'); recognition.start(); });
+                recognition.onresult = (event) => { inputs.wish.value += event.results[0][0].transcript; inputs.wish.dispatchEvent(new Event('input')); };
+                recognition.onerror = (event) => { console.error('Speech recognition error', event.error); };
+                recognition.onend = () => { buttons.mic.textContent = 'Nhập giọng nói'; buttons.mic.classList.remove('bg-red-500'); };
+            } else {
+                buttons.mic.disabled = true;
+                buttons.mic.textContent = 'Trình duyệt không hỗ trợ';
+            }
+            
             buttons.saveWish.addEventListener('click', () => {
-                state.tempWish = inputs.wish.value;
-                if (!state.tempWish) {
+                const wishText = inputs.wish.value;
+                if (!wishText) {
                     inputs.wish.classList.add('border-red-500', 'animate-shake');
                     setTimeout(() => inputs.wish.classList.remove('border-red-500', 'animate-shake'), 500);
                     return;
                 }
-                showModal('confirm');
+                const wordCount = countWords(wishText);
+                if (state.tempMusic && wordCount < MIN_WORDS_WITH_MUSIC) {
+                    document.getElementById('suggestion-message').textContent = 'Hãy gửi gắm lời yêu thương đến người ấy nhiều hơn nhé.';
+                    showModal('suggestion');
+                    return;
+                }
+                proceedWithSave();
             });
 
+            buttons.suggestionBack.addEventListener('click', () => showModal('suggestion', false));
+            buttons.suggestionContinue.addEventListener('click', () => { showModal('suggestion', false); proceedWithSave(); });
             buttons.back.addEventListener('click', () => showModal('confirm', false));
-            buttons.continue.addEventListener('click', () => {
-                showModal('confirm', false);
+            buttons.continue.addEventListener('click', () => { showModal('confirm', false); showModal('giver'); });
+            buttons.giverOk.addEventListener('click', () => {
+                const giverName = inputs.giverName.value.trim();
+                if (!giverName) {
+                     inputs.giverName.classList.add('border-red-500', 'animate-shake');
+                    setTimeout(() => inputs.giverName.classList.remove('border-red-500', 'animate-shake'), 500);
+                    return;
+                }
+                state.tempGiver = giverName;
+                showModal('giver', false);
                 showModal('recipient');
             });
-
             buttons.ok.addEventListener('click', async () => {
                 const recipientName = inputs.recipientName.value.trim();
                 if (!recipientName) {
-                    inputs.recipientName.classList.add('border-red-500', 'animate-shake');
+                     inputs.recipientName.classList.add('border-red-500', 'animate-shake');
                     setTimeout(() => inputs.recipientName.classList.remove('border-red-500', 'animate-shake'), 500);
                     return;
                 }
-                
-                const newGreeting = { wish: state.tempWish, images: state.tempImages };
-
+                showModal('recipient', false);
+                saveGreeting(recipientName, state.tempWish, state.tempImages, state.tempMusic, state.tempMusicName, state.tempGiver);
+            });
+            
+            buttons.deleteWish.addEventListener('click', () => { if (state.editingName) showModal('deleteConfirm'); });
+            buttons.cancelDelete.addEventListener('click', () => showModal('deleteConfirm', false));
+            buttons.confirmDelete.addEventListener('click', async () => {
+                if (!state.editingName) return;
                 try {
-                    await setDoc(doc(db, "greetings", recipientName), newGreeting);
-                    
-                    inputs.wish.value = '';
-                    inputs.image.value = '';
-                    displays.imagePreview.innerHTML = '';
-                    state.tempImages = [];
-                    state.tempWish = '';
-                    inputs.recipientName.value = '';
-                    
-                    showModal('recipient', false);
-                    showPage('home');
-                    displays.statusMessage.textContent = `Lời chúc của bạn đã được lưu!`;
+                    await deleteDoc(doc(db, "greetings", state.editingName));
+                    showModal('deleteConfirm', false); resetAdminForm(); showPage('home');
+                    displays.statusMessage.textContent = `Đã xóa lời chúc thành công!`;
                     displays.statusMessage.className = 'font-semibold mb-4 h-6 text-green-600';
-
                 } catch (error) {
-                    console.error("Error saving greeting: ", error);
-                    showModal('recipient', false);
-                    showPage('home');
-                    displays.statusMessage.textContent = "Lỗi: Không thể lưu lời chúc.";
+                    console.error("Error deleting document: ", error);
+                    displays.statusMessage.textContent = `Lỗi: Không thể xóa lời chúc.`;
                     displays.statusMessage.className = 'font-semibold mb-4 h-6 text-red-500';
                 }
             });
+
+            // Create and call an async function for Firebase init
+            async function initFirebase() {
+                try {
+                    const userFirebaseConfig = {
+                        apiKey: "AIzaSyBZO8E51RXCAeeWQNNKpLFZn8D3NaousUg",
+                        authDomain: "oi-chuc-20-10.firebaseapp.com",
+                        projectId: "oi-chuc-20-10",
+                        storageBucket: "oi-chuc-20-10.firebasestorage.app",
+                        messagingSenderId: "336530894385",
+                        appId: "1:336530894385:web:b2534d9962a49898d96f10",
+                        measurementId: "G-6DGPHX4ZN8"
+                    };
+                    const configToUse = typeof __firebase_config !== 'undefined' && __firebase_config ? JSON.parse(__firebase_config) : userFirebaseConfig;
+                    if (!configToUse || !configToUse.apiKey) throw new Error("Firebase config is missing.");
+                    
+                    const app = initializeApp(configToUse);
+                    const auth = getAuth(app);
+                    db = getFirestore(app); // Assign db here
+                    
+                    if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                        await signInWithCustomToken(auth, __initial_auth_token);
+                    } else {
+                        await signInAnonymously(auth);
+                    }
+                } catch (e) {
+                    console.error("Firebase initialization failed:", e);
+                    displays.statusMessage.textContent = "Lỗi kết nối cơ sở dữ liệu.";
+                    displays.statusMessage.classList.add('text-red-500');
+                    document.querySelector('button[form="name-form"]').disabled = true;
+                    inputs.name.disabled = true;
+                }
+            }
+
+            initFirebase(); // Call the function to start connecting in the background
         });
     </script>
 </body>
